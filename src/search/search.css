@@ -1,0 +1,35 @@
+.search__search-input {
+  margin-bottom: 32px !important;
+}
+.search__pagination {
+  text-align: center;
+}
+.movies {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+.movies__card {
+  margin-bottom: 35px;
+}
+.search .ant-pagination-prev .ant-pagination-item-link,
+.search .ant-pagination-next .ant-pagination-item-link,
+.search .ant-pagination-item {
+  border: 0;
+}
+.search .ant-pagination-item-active {
+  background: #1890ff;
+  border-radius: 4px;
+}
+.search .ant-pagination-item-active a {
+  color: white;
+}
+@media all and (max-width: 1009px) {
+  .movies {
+    flex-direction: column;
+  }
+  .movies__card {
+    margin-bottom: 20px;
+  }
+}
