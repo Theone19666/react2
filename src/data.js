@@ -7,7 +7,7 @@ export default class Data {
         if (resp.success === false) {
           throw new Error("Запрос выполнился неудачно");
         }
-        resp.json();
+        return resp.json();
       })
       .catch((err) => {
         throw new Error(err);

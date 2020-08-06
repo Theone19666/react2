@@ -7,26 +7,14 @@ import { Pagination, Spin, Alert } from "antd";
 export default class Search extends Component {
   render() {
     const { movies, loading, error, genres } = this.props;
-    const moviesHtml = movies.map((item, index) => {
-      const genresNames = item.genre_ids.map((id) => {
-        return genres.find((genre) => genre.id === id)?.name;
-      });
-      return (
-        <CardBlock
-          key={item.id}
-          genres={genresNames}
-          {...item}
-          className="movies__card"
-        />
-      );
-    });
     const load = loading ? (
       <Spin size="large" className="loader-wrapper" />
     ) : null;
     const errorHtml = error ? (
       <Alert message="Произошла ошибка при загрузке данных" type="error" />
     ) : null;
-    const content = !loading && !error ? <Content movies={moviesHtml} /> : null;
+    const content =
+      !loading && !error ? <Content movies={movies} genres={genres} /> : null;
     return (
       <div className="search">
         {load}
@@ -34,25 +22,23 @@ export default class Search extends Component {
         {content}
       </div>
     );
-    /*return (
-      <div className="search">
-        <SearchInput
-          placeholder="Type to search..."
-          size="large"
-          className="search__search-input"
-        />
-        <div className="movies">{movies}</div>
-        <Pagination
-          defaultPageSize={6}
-          total={this.props.movies.length}
-          className="search__pagination"
-        />
-      </div>
-    );*/
   }
 }
 
-const Content = ({ movies }) => {
+const Content = ({ movies, genres }) => {
+  const moviesHtml = movies.map((item, index) => {
+    const genresNames = item.genre_ids.map((id) => {
+      return genres.find((genre) => genre.id === id)?.name;
+    });
+    return (
+      <CardBlock
+        key={item.id}
+        genres={genresNames}
+        {...item}
+        className="movies__card"
+      />
+    );
+  });
   return (
     <React.Fragment>
       <SearchInput
@@ -60,7 +46,7 @@ const Content = ({ movies }) => {
         size="large"
         className="search__search-input"
       />
-      <div className="movies">{movies}</div>
+      <div className="movies">{moviesHtml}</div>
       <Pagination
         defaultPageSize={6}
         total={movies.length}
