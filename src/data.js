@@ -14,9 +14,11 @@ export default class Data {
       });
   }
 
-  getMovies() {
+  getMovies(page = 1, query = "") {
     return this.sendRequest(
-      `${this.APIURL}/search/movie?api_key=${this.APIKEY}&language=en-US&query=return&include_adult=false`,
+      `${this.APIURL}/search/movie?api_key=${
+        this.APIKEY
+      }&language=en-US&query=${`${query} `}return&page=${page}&include_adult=false`,
     );
   }
   getGenres() {

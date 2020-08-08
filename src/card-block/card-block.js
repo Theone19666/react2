@@ -27,7 +27,11 @@ function CardBlock(props) {
       <img
         className="card-block__img"
         alt={title}
-        src={`https://image.tmdb.org/t/p/original/${poster_path}`}
+        src={
+          poster_path
+            ? `https://image.tmdb.org/t/p/original/${poster_path}`
+            : ""
+        }
       />
 
       <div className="card-block__description">
