@@ -11,3 +11,6 @@
   margin: 0 auto;
   padding: 32px 36px 14px 36px;
 }
+.search__search-input {
+  margin-bottom: 32px !important;
+}

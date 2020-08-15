@@ -1,93 +1,101 @@
 import React, { Component } from "react";
 import "./search.css";
 import SearchInput from "../search-input";
-import CardBlock from "../card-block";
-import { Pagination, Spin, Alert } from "antd";
+import Movies from "../movies";
+import { debounce } from "lodash";
 
 export default class Search extends Component {
+  state = {
+    movies: [],
+    loading: true,
+    error: false,
+    page: 1,
+    total: 0,
+  };
+
+  onPaginationChange = (page, pageSize) => {
+    this.setState({ loading: true });
+    //data
+    this.props
+      .getMovies(page)
+      .then((resp) => {
+        this.setState({ movies: resp.results, loading: false, page });
+      })
+      .catch(() => this.setState({ error: true, loading: false }));
+  };
+
+  componentDidMount() {
+    this.props
+      .getMovies()
+      .then((resp) => {
+        this.setState({
+          movies: resp.results,
+          total: resp.total_results,
+          loading: false,
+        });
+      })
+      .catch(() => this.setState({ error: true, loading: false }));
+  }
+
+  onSearch = (e) => {
+    this.setState({ loading: true });
+    //data
+    this.props
+      .getMovies(1, e.target.value)
+      .then((resp) => {
+        this.setState({
+          movies: resp.results,
+          loading: false,
+          page: this.state.page,
+          total: resp.total_results,
+        });
+      })
+      .catch(() => this.setState({ error: true, loading: false }));
+  };
+
+  setMovieRate = (rate = 0, id) => {
+    const { questSessionId, rateMovie } = this.props;
+    rateMovie({ questSession: questSessionId, movieId: id, rate })
+      .then((resp) => {
+        console.log("resp", resp);
+        if (resp.success) {
+          this.props.getMovies();
+        } else {
+          throw new Error("Запрос выполнился неудачно");
+        }
+      })
+      .catch(() => this.setState({ error: true, loading: false }));
+  };
+
+  debounceEvent(...args) {
+    this.debouncedEvent = debounce(...args);
+    return (e) => {
+      e.persist();
+      return this.debouncedEvent(e);
+    };
+  }
   render() {
-    const {
-      movies,
-      loading,
-      error,
-      genres,
-      total,
-      onPaginationChange,
-      page,
-      onSearch,
-    } = this.props;
-    const load = loading ? (
-      <Spin size="large" className="loader-wrapper" />
-    ) : null;
-    const errorHtml = error ? (
-      <Alert message="Произошла ошибка при загрузке данных" type="error" />
-    ) : null;
-    const moviesNotFound =
-      !movies.length && !loading ? (
-        <Alert message="По Вашему запросу ничего не найдено" type="success" />
-      ) : null;
-    const content =
-      !loading && !error && movies.length ? (
-        <Content
-          movies={movies}
-          genres={genres}
-          total={total}
-          onPaginationChange={onPaginationChange}
-          page={page}
-          onSearch={onSearch}
-        />
-      ) : null;
+    const { movies, loading, error, total, page } = this.state;
     return (
       <div className="search">
         <SearchInput
           placeholder="Type to search..."
           size="large"
           className="search__search-input"
-          onInput={onSearch}
+          onInput={this.debounceEvent(this.onSearch, 1000)}
         />
-        {load}
-        {errorHtml}
-        {moviesNotFound}
-        {content}
+        <Movies
+          movies={movies}
+          genres={this.props.genres}
+          loading={loading}
+          error={error}
+          total={total}
+          onPaginationChange={this.onPaginationChange}
+          page={page}
+          rateMovie={this.setMovieRate}
+          questSessionId={this.props.questSessionId}
+        />
       </div>
     );
   }
 }
-
-const Content = ({
-  movies,
-  genres,
-  total,
-  onPaginationChange,
-  page,
-  onSearch,
-}) => {
-  const moviesHtml = movies.map((item, index) => {
-    const genresNames = item.genre_ids.map((id) => {
-      return genres.find((genre) => genre.id === id)?.name;
-    });
-    return (
-      <CardBlock
-        key={item.id}
-        genres={genresNames}
-        {...item}
-        className="movies__card"
-      />
-    );
-  });
-  return (
-    <React.Fragment>
-      <div className="movies">{moviesHtml}</div>
-      {movies.length && (
-        <Pagination
-          defaultPageSize={20}
-          total={total}
-          className="search__pagination"
-          onChange={onPaginationChange}
-          current={page}
-          showSizeChanger={false}
-        />
-      )}
-    </React.Fragment>
-  );
-};

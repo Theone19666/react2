@@ -61,11 +61,20 @@
   font-size: 12px;
   line-height: 24px;
   top: 12px;
-  border: 2px solid #e9d100;
+  border: 2px solid #e90000;
   border-radius: 50%;
   text-align: center;
   width: 30px;
   height: 30px;
+}
+.card-block__vote-average-middle {
+  border-color: #e97e00;
+}
+.card-block__vote-average-high {
+  border-color: #e9d100;
+}
+.card-block__vote-average-highest {
+  border-color: #66e900;
 }
 @media all and (max-width: 1009px) {
   .card-block {
